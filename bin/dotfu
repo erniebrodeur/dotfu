@@ -1,3 +1,22 @@
 #!/usr/bin/env ruby
 
 require 'dotfu'
+require 'yaml'
+
+print "checking for updates: "
+output = Dotfu.fetch 'erniebrodeur', 'test'
+puts output[2]
+
+
+# if !Dotfu.is_installed? 'erniebrodeur', 'test'
+#   puts "Installing"
+#   Dotfu.install 'erniebrodeur', 'test'
+# else
+#   puts "uninstalling"
+#   Dotfu.uninstall 'erniebrodeur', 'test'
+# end
+
+
+puts Dotfu.backup 'test'
+puts Dotfu.install 'erniebrodeur', 'test'
+puts Dotfu.restore 'test'

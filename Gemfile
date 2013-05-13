@@ -3,6 +3,8 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
+  gem "bundler"
+  gem "rake"
   gem "pry"
   gem "pry-debugger"
   gem "redcarpet"
@@ -20,7 +22,6 @@ end
 
 group :test do
   gem "rspec"
-  gem "rake"
   gem "webmock"
   gem 'simplecov', :require => false
   gem 'simplecov-rcov', :require => false

@@ -19,7 +19,6 @@ module Dotfu
   end
 
 
-  # install, backup along the way.
   def install(username, dotfiles)
     fetch(username, dotfiles) if !is_cached? username, dotfiles
 

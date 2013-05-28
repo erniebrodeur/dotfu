@@ -5,11 +5,11 @@ module Dotfu
     def fetch(opts = nil, args = nil)
       return nil if !args
 
+      # POC only, it still needs to check for output errors and a few other things.
       args.each do |a|
-        pairs = Dotfu.process_word a
-        puts "Fetching #{a}"
-        puts Dotfu::Git.fetch pairs[0], pairs[1]
-        puts "Fetched #{a}"
+        repo = Dotfu::Repos.new a
+        output = repo.fetch
+        puts "Repo #{repo.repo}:\n#{output[1]}"
       end
     end
 

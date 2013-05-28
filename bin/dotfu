@@ -6,7 +6,7 @@ require 'yaml'
 
 require 'slop'
 
-if !Dotfu::Git.installed?
+if !Dotfu.installed?
   puts "Git does not appear to be installed, aporting."
   exit 1
 end
@@ -20,6 +20,7 @@ opts = Slop.parse(help:true) do
     puts "Version #{Dotfu.VERSION}"
   end
 
+  on :data_directory, "Root directory to fetch into (default: #{Bini.data_dir}/repos)"
   on :verbose, 'Enable verbose mode'
 
   command 'install' do
@@ -29,7 +30,7 @@ opts = Slop.parse(help:true) do
     banner "Uninstall dotfiles from your home directory."
   end
   command 'fetch' do
-    banner "Fetch a repo into the cache in #{Dotfu.data_dir}/repos\n"\
+    banner "Fetch a repo into it's cache dir.\n"\
       "Usage: dotfu fetch [options] DOTFILES\n"
 
     run do |opts, args|

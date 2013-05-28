@@ -12,8 +12,9 @@ module Dotfu
         puts "Fetched #{a}"
       end
     end
+
     def list(opts = nil, args = nil)
-      username = Dotfu::Git.config_user
+      username = Dotfu.config_user
       begin
         results = Dotfu::GITHUB.repos.list(user:username).select {|r| r.name.start_with? 'dotfiles' };
       rescue Exception => e
@@ -33,4 +34,3 @@ module Dotfu
     end
   end
 end
-

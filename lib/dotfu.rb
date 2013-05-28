@@ -6,12 +6,12 @@ require 'bini/sash'
 require 'github_api'
 
 require "dotfu/version"
-require "dotfu/helpers"
 require "dotfu/commands"
-require "dotfu/git"
-require "dotfu/backup"
+require "dotfu/repos"
 
 module Dotfu
+  extend self
+
   def install(username, dotfiles)
     Dotfu::Git.fetch(username, dotfiles) if !is_cached? username, dotfiles
 
@@ -33,28 +33,37 @@ module Dotfu
   def clean(username = nil, dotfiles = nil)
   end
 
-  # process various possible mini-uri's into username/dotfile pairs.
-  #
-  # "string"  Assume this is the repo, look up the config for user.
-  # "username:string" obvious.
-  # "username@string" obvious.
-  #
-  def process_word(word)
-    result = word.gsub "@", ":"
-    if result.include? ":"
-      output = result.split ":"
-      return output[0], to_repo(output[1])
-    else
-      return [Dotfu::Git.config_user, to_repo(result)]
+  # what does the config say our user is?
+  def config_user
+    if !instance_variables.include? "@config_user"
+      if installed?
+        output = `git config github.user`.chomp!
+        if output.empty?
+          @config_user = nil
+        else
+          @config_user = output
+        end
+      end
     end
+
+    return @config_user
   end
 
-  def to_repo(repo)
-    return repo if repo.start_with? 'dotfiles-'
-    return "dotfiles-#{repo}"
+  # Is git installed in the system?
+  def installed?
+    if !@git_installed
+      results = ENV["PATH"].split(":").map do |path|
+        File.exist?("#{path}/git")
+      end
+
+      @git_installed = results.include? true
+    end
+    return @git_installed
   end
 
-  public
   Bini.long_name = "dotfu"
   GITHUB ||= Github.new user_agent:"Dotfu: #{Dotfu::VERSION}", auto_pagination:true
 end
+
+
+

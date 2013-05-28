@@ -26,20 +26,10 @@ opts = Slop.parse(help:true) do
   command 'uninstall' do
     banner "Uninstall dotfiles from your home directory."
   end
-  command 'fetch' do
-    banner "Fetch a repo into it's cache dir.\n"\
-      "Usage: dotfu fetch [options] DOTFILES\n"
 
-    run do |opts, args|
-      Dotfu::Commands.fetch opts, args
-    end
-  end
-
-  command 'list' do
-    banner "List the repos of a given user."
-    run do |opts, args|
-      Dotfu::Commands.list opts, args
-    end
+  # not sure that this is the right dir after install.  Need to determine that.
+  Dir.glob("commands/*.rb").each do |file|
+    instance_eval open(file).read
   end
 
   command 'search' do

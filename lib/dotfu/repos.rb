@@ -30,15 +30,15 @@ module Dotfu
 
     # return the explicit directory this repo is cloned into.
     def working_dir
-      return nil if !repo
-      return "#{Bini.data_dir}/repos/#{repo}"
+      return nil if !repo || !user
+      return "#{Bini.data_dir}/repos/#{user}/#{repo}"
     end
 
     ### Work methods
 
     # initial clone
     def clone
-      return nil if !repo
+      return nil if !repo || !user
       cmd = "git clone git://github.com/#{user}/#{repo}.git #{working_dir}"
 
       out, err, status = Open3.capture3 cmd
@@ -47,7 +47,7 @@ module Dotfu
 
     # A wrapper method to clone or update a repo.
     def fetch
-      return nil if !repo
+      return nil if !repo || !user
       if fetched?
         pull
       else
@@ -56,7 +56,7 @@ module Dotfu
     end
 
     def pull
-      return nil if !repo
+      return nil if !repo || !user
       cmd = "git pull"
 
       pwd = Dir.pwd
@@ -96,10 +96,10 @@ module Dotfu
       result = word.gsub "@", ":"
       if result.include? ":"
         output = result.split ":"
-        user = output[0]
-        repo = output[1]
+        self.user = output[0]
+        self.repo = output[1]
       else
-        repo = result
+        self.repo = result
       end
     end
   end

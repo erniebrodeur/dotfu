@@ -1,0 +1,26 @@
+// General options
+// Everything is relative to this directory.
+// There are no directories past this point, only files.
+{
+  "target_directory":"/home/ebrodeur/.config/powerline",
+
+// Ignore Patterns (optional)
+// Takes an array or entry, if array it is a collection of glob or regex.
+// Regex is stored in a string and detection done in application.
+
+  "ignore_patterns":["README.md", "**/*.md", "/.*/" ],
+
+// Segments (optional)
+// Segments allow for smaller parts to be installed as needed/requested.
+// Each segment is a named object with a collection of pattern/location pairs.
+  "segments":{
+    "zsh":{
+      "pre_install_script":"filename",
+      "post_install_script":"filename",
+      "routes":{
+        ".zshrc":"/",
+        "zsh":"/"
+      }
+    }
+  }
+}

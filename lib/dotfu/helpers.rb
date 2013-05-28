@@ -42,7 +42,7 @@ module Dotfu
   end
 
   def dotfile_dir(dotfile)
-    "#{data_dir}/repos/dotfiles-#{dotfile}"
+    "#{data_dir}/repos/#{dotfile}"
   end
 
   # File helpers

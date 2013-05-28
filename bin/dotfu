@@ -3,20 +3,54 @@
 require 'dotfu'
 require 'yaml'
 
-print "checking for updates: "
-output = Dotfu.fetch 'erniebrodeur', 'test'
-puts output[2]
 
+require 'slop'
 
-# if !Dotfu.is_installed? 'erniebrodeur', 'test'
-#   puts "Installing"
-#   Dotfu.install 'erniebrodeur', 'test'
-# else
-#   puts "uninstalling"
-#   Dotfu.uninstall 'erniebrodeur', 'test'
-# end
+if !Dotfu::Git.installed?
+  puts "Git does not appear to be installed, aporting."
+  exit 1
+end
 
+opts = Slop.parse(help:true) do
+  banner "Dotfu:\n"\
+    "DOTFILES is a string that can be user:repo or user@repo.  If no user is "\
+    "provided, it will attempt to look one up from the git config file.\n"
 
-puts Dotfu.backup 'test'
-puts Dotfu.install 'erniebrodeur', 'test'
-puts Dotfu.restore 'test'
+  on :v, :version, 'Print the version' do
+    puts "Version #{Dotfu.VERSION}"
+  end
+
+  on :verbose, 'Enable verbose mode'
+
+  command 'install' do
+    banner "Install a dotfiles from Github into your home directory."
+  end
+  command 'uninstall' do
+    banner "Uninstall dotfiles from your home directory."
+  end
+  command 'fetch' do
+    banner "Fetch a repo into the cache in #{Dotfu.data_dir}/repos\n"\
+      "Usage: dotfu fetch [options] DOTFILES\n"
+
+    run do |opts, args|
+      Dotfu::Commands.fetch opts, args
+    end
+  end
+
+  command 'list' do
+    banner "List the repos of a given user."
+    run do |opts, args|
+      Dotfu::Commands.list opts, args
+    end
+  end
+
+  command 'search' do
+    banner "Search for a repo globally or in a user's directory."
+  end
+  command 'clean' do
+    banner "Purge any unused files from the cached repos."
+  end
+  command 'status' do
+    banner "Spit out various stats about the cached/installed repos."
+  end
+end

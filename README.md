@@ -1,4 +1,4 @@
-thought dump:
+# thought dump:
 
 Make a command on the cli called 'dotfiles'.
 
@@ -35,14 +35,14 @@ Install/update/uninstall will support ```any``` as an argument.  This will
 install everything it can by default.  It will also support a gist location
 to support installing sets of dotfiles.
 
-Strategies:
+# Strategies:
 
 It will pull the repo into a ~/.cache/dotfiles/n directory.  The file will look
 for config.json, if none is present it will assume all files are to be linked
 to root.  If one is present, it can have specific lists of file/locations and
 list post install scripts as well as files in the directory to ignore.
 
-It will backup along the wall.  Likely to ~/.dotfiles/backups, but I may check
+It will backup along the way.  Likely to ~/.dotfiles/backups, but I may check
 if XDG has some comment on backup directories.
 
 It will cache everything possible.  This is so you can testdrive different
@@ -68,11 +68,37 @@ default but can be overridden based on the dotfiles.json.
 Their will be no need for sub directories.  Dotfiles and install files will not
 be linked, by default everything else will be.
 
+It will support segments.  These are small sections of files in a larger repo
+that can be managed by command.
 
-Files:
+All files will be relative to the ```target_directory``` property.
 
- * dotfiles.json: main configuration file.
- * install.??: the (post) install script.
+# Configfile
+
+The config file will be a json blob.  It will be named ```dotfu.json``` and
+should be present at the base of the repo.
+
+## Fields
+
+  * target_directory
+  * ignore_patterns
+  * segments (see below)
+
+# Segments
+
+  * pre_install_script
+  * post_install_script
+  * routes
+
+# Project Files
+
+  * lib/dotfu/dotfu.rb
+  * lib/dotfu/backup.rb
+  * lib/dotfu/config_parser.rb
+  * lib/dotfu/helpers.rb
+  * lib/dotfu/cache.rb
+
+# Dependencies
 
 # Gh::Dotfiles
 

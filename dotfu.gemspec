@@ -21,4 +21,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "bini"
   spec.add_runtime_dependency "git"
   spec.add_runtime_dependency "github_api"
+  spec.add_runtime_dependency "slop"
 end

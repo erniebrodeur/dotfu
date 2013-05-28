@@ -48,7 +48,7 @@ module Dotfu
     # A wrapper method to clone or update a repo.
     def fetch
       return nil if !repo
-      if cached?
+      if fetched?
         pull
       else
         clone
@@ -70,7 +70,7 @@ module Dotfu
     ### Helper methods
 
     # I need to make this more sophisticated.  Or make a like updated? method.
-    def cached?
+    def fetched?
       return nil if !repo
       return false if !working_dir
       files = Dir.glob("#{working_dir}/**/*")
@@ -79,6 +79,14 @@ module Dotfu
       return false
     end
 
+    # does it have a config file?  Must be fetched or will return nil.
+    def config_file?
+      return nil unless fetched?
+
+      return File.exist? "#{working_dir}/default.json"
+    end
+
+    # Is it installed?  no, because we can't install anything yet.
     def installed?
       return false
     end

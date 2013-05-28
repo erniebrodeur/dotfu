@@ -16,12 +16,9 @@ opts = Slop.parse(help:true) do
     "DOTFILES is a string that can be user:repo or user@repo.  If no user is "\
     "provided, it will attempt to look one up from the git config file.\n"
 
-  on :v, :version, 'Print the version' do
-    puts "Version #{Dotfu.VERSION}"
-  end
-
-  on :data_directory, "Root directory to fetch into (default: #{Bini.data_dir}/repos)"
-  on :verbose, 'Enable verbose mode'
+  on(:v, :verbose, 'Enable verbose mode')
+  on(:version, 'Print the version') {puts "Version #{Dotfu::VERSION}" }
+  on(:data_directory, "Root directory to fetch into (default: #{Bini.data_dir}/repos)")
 
   command 'install' do
     banner "Install a dotfiles from Github into your home directory."

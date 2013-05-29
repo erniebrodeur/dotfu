@@ -1,8 +1,9 @@
 #!/usr/bin/ruby
 
+test_cmd = "bundle exec dotfu install zsh"
 guard :bundler do
-	watch 'Gemfile'
-	watch '*.gemspec'
+  watch 'Gemfile'
+  watch '*.gemspec'
 end
 
 guard :rspec do
@@ -15,3 +16,11 @@ end
 # guard :yard do
 #   watch(%r{^lib/(.+)\.rb$})
 # end
+
+guard :shell do
+  watch /.*/ do
+    puts "=" * 80
+    puts "Time: #{Time.now}, cmd: #{test_cmd}"
+    `#{test_cmd}`
+  end
+end

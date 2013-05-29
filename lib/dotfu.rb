@@ -1,4 +1,5 @@
 require 'open3'
+require 'yajl'
 require 'bini'
 require 'bini/config'
 require 'bini/optparser'
@@ -6,7 +7,6 @@ require 'bini/sash'
 require 'github_api'
 
 require "dotfu/version"
-require "dotfu/commands"
 require "dotfu/repos"
 
 module Dotfu

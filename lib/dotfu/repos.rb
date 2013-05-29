@@ -4,16 +4,14 @@ module Dotfu
     attr_accessor :user
     attr_accessor :config_file
     attr_accessor :working_dir
-
+    attr_accessor :target_directory
 
     # r can be either a repo, or a user:repo pair.
     def initialize(arg = nil)
-      self.repo = process_arg arg if arg
+      self.repo = parse_arg arg if arg
     end
 
     ### Specialized attribute methods
-
-    # return a config_file (if overriden) or the default of 'dotfu.json'
     def config_file
       return @config_file ? @config_file : "dotfu.json"
     end
@@ -21,6 +19,11 @@ module Dotfu
     # prepend repo with dotfiles- if it doesn't exist as it is set.
     def repo=(word)
       return @repo = word.start_with?('dotfiles-') ? word : "dotfiles-#{word}"
+    end
+
+    # target_directory should always return something.
+    def target_directory
+      return @target_directory ? @target_directory : Dir.home
     end
 
     # return user or the user in the config file.
@@ -81,9 +84,9 @@ module Dotfu
 
     # does it have a config file?  Must be fetched or will return nil.
     def config_file?
-      return nil unless fetched?
+      return false unless fetched?
 
-      return File.exist? "#{working_dir}/default.json"
+      return File.exist? "#{working_dir}/#{config_file}"
     end
 
     # Is it installed?  no, because we can't install anything yet.
@@ -92,7 +95,7 @@ module Dotfu
     end
 
     private
-    def process_arg(word)
+    def parse_arg(word)
       result = word.gsub "@", ":"
       if result.include? ":"
         output = result.split ":"
@@ -102,8 +105,12 @@ module Dotfu
         self.repo = result
       end
     end
+
+    def parse_config
+      return nil unless config_file?
+
+      content = Yajl.load "{\"target_directory\":\"/home/ebrodeur/Projects/gems/dotfu/tmp\"}"
+      @target_directory = content["target_directory"] if content["target_directory"]
+    end
   end
 end
-
-
-

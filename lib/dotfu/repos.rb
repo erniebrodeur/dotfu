@@ -9,6 +9,7 @@ module Dotfu
     # r can be either a repo, or a user:repo pair.
     def initialize(arg = nil)
       self.repo = parse_arg arg if arg
+      parse_config
     end
 
     ### Specialized attribute methods
@@ -55,6 +56,23 @@ module Dotfu
         pull
       else
         clone
+      end
+    end
+
+
+    def install
+      # TODO: clean this up for readability.
+      # .map {|f| f.split(working_dir)[1][1..-1]}
+      files = Dir.glob("#{working_dir}/*")
+      files.each do |file|
+        working_file = file.split(working_dir)[1][1..-1]
+        target_file = "#{target_directory}/.#{working_file}"
+        next if working_file == config_file
+        if File.exist? target_file
+          puts "File exists: #{target_file}, skipping."
+          next
+        end
+          FileUtils.ln_s file, target_file, verbose:true, noop:true
       end
     end
 

@@ -19,10 +19,7 @@ opts = Slop.parse(help:true) do
   on(:v, :verbose, 'Enable verbose mode')
   on(:version, 'Print the version') {puts "Version #{Dotfu::VERSION}" }
   on(:data_directory, "Root directory to fetch into (default: #{Bini.data_dir}/repos)")
-
-  command 'install' do
-    banner "Install a dotfiles from Github into your home directory."
-  end
+  on(:target_directory, "Change the default target directory from your home: #{Dir.home}")
   command 'uninstall' do
     banner "Uninstall dotfiles from your home directory."
   end

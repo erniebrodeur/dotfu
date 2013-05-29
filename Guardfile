@@ -18,9 +18,9 @@ end
 # end
 
 guard :shell do
-  watch /.*/ do
+  watch /.*/ do |m|
     puts "=" * 80
-    puts "Time: #{Time.now}, cmd: #{test_cmd}"
+    puts "Time: #{Time.now}, file saveD: #{m} cmd: #{test_cmd}"
     `#{test_cmd}`
   end
 end

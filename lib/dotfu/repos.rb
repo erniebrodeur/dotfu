@@ -109,14 +109,18 @@ module Dotfu
       return File.exist? "#{working_dir}/#{config_file}"
     end
 
-    # Is it installed?  no, because we can't install anything yet.
+    # returns true if every file is installed.  I need to make this more indepth,
+    # but it will at lease ensure all files are linked to something in the working dir.
     def installed?
-      return false
+      results = target_files.map {|f| is_my_file?(f) }
+      return false if results.include? false
+      return true
     end
 
     # Return true if this file was installed from our repo.
     def is_my_file?(file)
-      return nil unless File.exist? target_file(file_string(file))
+      return true if File.exist?(file) && File.symlink?(file) && File.readlink(file).start_with?(working_dir)
+      return false
     end
     # return an [Array] of base filenames.
     def files
@@ -177,5 +181,6 @@ module Dotfu
     end
   end
 end
+
 
 

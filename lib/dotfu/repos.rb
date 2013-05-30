@@ -61,22 +61,17 @@ module Dotfu
 
 
     def install
-      # TODO: add deep linking (mkdir + ln_s for each target) or shallow (just the first directory)
-
-
       # lets check if we have anything in the way, and abort instead of partially
       # installing
       existing_files = target_files.select {|f| File.exist? f}
       raise NotImplementedError.new "File(s) exist: #{existing_files}"
 
       # And now that we are ok with everything, lets make some fucking files.
+      # TODO: add deep linking (mkdir + ln_s for each target) or shallow (just the first directory)
       FileUtils.mkdir_p target_dir
-      files.each do |file|
-        working_file = file.split(working_dir)[1][1..-1]
-        target_file = "#{target_dir}/.#{working_file}"
+      files.each {|file| FileUtils.ln_s file, target_file(file)}
 
-        FileUtils.ln_s file, target_file
-      end
+      return true
     end
 
     def pull
@@ -119,6 +114,10 @@ module Dotfu
       return false
     end
 
+    # Return true if this file was installed from our repo.
+    def is_my_file?(file)
+      return nil unless File.exist? target_file(file_string(file))
+    end
     # return an [Array] of base filenames.
     def files
       if !@files
@@ -129,15 +128,28 @@ module Dotfu
       return @files
     end
 
+    # Return the target file.
+    # Takes a [String] (explicit conversion) or [Array] for index lookup.
+    def target_file(file)
+      "#{target_dir}/.#{file_string(file)}"
+    end
+
     # Return an [Array] of target files.
     def target_files
-      files.map {|f| "#{target_dir}/.#{f}"}
+      files.map {|f| target_file f}
+    end
+
+    # return the working file.
+    # Takes a [String] (explicit conversion) or [Array] for index lookup.
+    def working_file(file)
+      "#{working_dir}/#{file_string(file)}"
     end
 
     # Return an [Array] of working files.
     def working_files
-      files.map {|f| "#{working_dir}/#{f}"}
+      files.map {|f| working_file f}
     end
+
 
     private
     def parse_arg(word)
@@ -157,8 +169,13 @@ module Dotfu
       content = Yajl.load "{\"target_dir\":\"/home/ebrodeur/Projects/gems/dotfu/tmp\"}"
       @target_dir = content["target_dir"] if content["target_dir"]
     end
+
+    # Accepts a string or fixnum.  Returns either the string or the files[fixnum]
+    # TODO: figure out a better fucking name for this.
+    def file_string(file)
+      return file.class == Fixnum ? files[file] : file
+    end
   end
 end
-
 
 

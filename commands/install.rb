@@ -17,4 +17,3 @@ command 'install' do
     end
   end
 end
-

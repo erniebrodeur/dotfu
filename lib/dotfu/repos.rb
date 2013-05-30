@@ -61,18 +61,31 @@ module Dotfu
 
 
     def install
-      # TODO: clean this up for readability.
-      # .map {|f| f.split(working_dir)[1][1..-1]}
+      # TODO: add deep linking (mkdir + ln_s for each target) or shallow (just the first directory)
       files = Dir.glob("#{working_dir}/*")
+      files.delete "#{working_dir}/#{config_file}"
+
+      # lets check if we have anything in the way, and abort instead of partially
+      # installing
+
+      existing_files = []
+
       files.each do |file|
         working_file = file.split(working_dir)[1][1..-1]
         target_file = "#{target_directory}/.#{working_file}"
-        next if working_file == config_file
-        if File.exist? target_file
-          puts "File exists: #{target_file}, skipping."
-          next
-        end
-          FileUtils.ln_s file, target_file, verbose:true, noop:true
+
+        existing_files << target_file if File.exist? "#{target_file}"
+      end
+
+      raise NotImplementedError.new "File(s) exist: #{existing_files}"
+
+      # And now that we are ok with everything, lets make some fucking files.
+      FileUtils.mkdir_p target_directory
+      files.each do |file|
+        working_file = file.split(working_dir)[1][1..-1]
+        target_file = "#{target_directory}/.#{working_file}"
+
+        FileUtils.ln_s file, target_file
       end
     end
 
@@ -132,3 +145,6 @@ module Dotfu
     end
   end
 end
+
+
+

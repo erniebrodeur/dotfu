@@ -12,27 +12,6 @@ require "dotfu/repos"
 module Dotfu
   extend self
 
-  def install(username, dotfiles)
-    Dotfu::Git.fetch(username, dotfiles) if !is_cached? username, dotfiles
-
-    files = process_dotfiles(dotfiles)
-
-    files.each do |pair|
-      FileUtils.ln_s pair[0], pair[1] if File.exists? pair[0]
-    end
-  end
-
-  # Remove the links, put the backups in place.
-  def uninstall(username, dotfiles)
-    process_dotfiles(dotfiles).each do |pair|
-      puts pair
-    end
-  end
-
-  # clean up the cache, by default remove anything that isn't linked.
-  def clean(username = nil, dotfiles = nil)
-  end
-
   # what does the config say our user is?
   def config_user
     if !instance_variables.include? "@config_user"

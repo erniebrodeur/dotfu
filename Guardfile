@@ -1,6 +1,11 @@
 #!/usr/bin/ruby
 
-test_cmd = "bundle exec dotfu install zsh"
+# Must be an array
+test_cmd = [
+  "bundle exec dotfu install zsh",
+  "bundle exec dotfu uninstall zsh"
+]
+
 guard :bundler do
   watch 'Gemfile'
   watch '*.gemspec'
@@ -19,8 +24,12 @@ end
 
 guard :shell do
   watch /.*/ do |m|
-    puts "=" * 80
-    puts "Time: #{Time.now}, file saveD: #{m} cmd: #{test_cmd}"
-    `#{test_cmd}`
+    puts "Time: #{Time.now}, file saved: #{m}"
+    test_cmd.each do |cmd|
+
+      puts "=" * 80
+      puts "cmd: #{cmd}"
+      puts `#{cmd}`
+    end
   end
 end

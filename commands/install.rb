@@ -15,5 +15,6 @@ command 'install' do
       puts "Installing #{target} to #{repo.target_dir}"
       repo.install
     end
+    puts "Complete."
   end
 end

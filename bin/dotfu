@@ -20,9 +20,6 @@ opts = Slop.parse(help:true) do
   on(:version, 'Print the version') {puts "Version #{Dotfu::VERSION}" }
   on(:data_directory, "Root directory to fetch into (default: #{Bini.data_dir}/repos)")
   on(:target_directory, "Change the default target directory from your home: #{Dir.home}")
-  command 'uninstall' do
-    banner "Uninstall dotfiles from your home directory."
-  end
 
   # not sure that this is the right dir after install.  Need to determine that.
   Dir.glob("commands/*.rb").each do |file|

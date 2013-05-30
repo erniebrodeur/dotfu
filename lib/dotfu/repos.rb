@@ -64,12 +64,12 @@ module Dotfu
       # lets check if we have anything in the way, and abort instead of partially
       # installing
       existing_files = target_files.select {|f| File.exist? f}
-      raise NotImplementedError.new "File(s) exist: #{existing_files}"
+      raise NotImplementedError.new "File(s) exist: #{existing_files}" if existing_files.any?
 
       # And now that we are ok with everything, lets make some fucking files.
       # TODO: add deep linking (mkdir + ln_s for each target) or shallow (just the first directory)
       FileUtils.mkdir_p target_dir
-      files.each {|file| FileUtils.ln_s file, target_file(file)}
+      files.each {|file| FileUtils.ln_s working_file(file), target_file(file)}
 
       return true
     end
@@ -87,7 +87,12 @@ module Dotfu
     end
 
     def uninstall
+      raise RuntimeError.new "Not installed." unless installed?
 
+      # ok we are not installed, lets clear the links.  Later, this will restore
+      # the backups (or something similiar).
+      target_files.each {|f| FileUtils.rm f}
+      return true
     end
 
     ### Helper methods

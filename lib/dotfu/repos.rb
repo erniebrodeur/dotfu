@@ -4,7 +4,7 @@ module Dotfu
     attr_accessor :user
     attr_accessor :config_file
     attr_accessor :working_dir
-    attr_accessor :target_directory
+    attr_accessor :target_dir
 
     # r can be either a repo, or a user:repo pair.
     def initialize(arg = nil)
@@ -22,9 +22,9 @@ module Dotfu
       return @repo = word.start_with?('dotfiles-') ? word : "dotfiles-#{word}"
     end
 
-    # target_directory should always return something.
-    def target_directory
-      return @target_directory ? @target_directory : Dir.home
+    # target_dir should always return something.
+    def target_dir
+      return @target_dir ? @target_dir : Dir.home
     end
 
     # return user or the user in the config file.
@@ -62,28 +62,18 @@ module Dotfu
 
     def install
       # TODO: add deep linking (mkdir + ln_s for each target) or shallow (just the first directory)
-      files = Dir.glob("#{working_dir}/*")
-      files.delete "#{working_dir}/#{config_file}"
+
 
       # lets check if we have anything in the way, and abort instead of partially
       # installing
-
-      existing_files = []
-
-      files.each do |file|
-        working_file = file.split(working_dir)[1][1..-1]
-        target_file = "#{target_directory}/.#{working_file}"
-
-        existing_files << target_file if File.exist? "#{target_file}"
-      end
-
+      existing_files = target_files.select {|f| File.exist? f}
       raise NotImplementedError.new "File(s) exist: #{existing_files}"
 
       # And now that we are ok with everything, lets make some fucking files.
-      FileUtils.mkdir_p target_directory
+      FileUtils.mkdir_p target_dir
       files.each do |file|
         working_file = file.split(working_dir)[1][1..-1]
-        target_file = "#{target_directory}/.#{working_file}"
+        target_file = "#{target_dir}/.#{working_file}"
 
         FileUtils.ln_s file, target_file
       end
@@ -99,6 +89,10 @@ module Dotfu
 
       Dir.chdir pwd
       return [status, out, err]
+    end
+
+    def uninstall
+
     end
 
     ### Helper methods
@@ -125,6 +119,26 @@ module Dotfu
       return false
     end
 
+    # return an [Array] of base filenames.
+    def files
+      if !@files
+        files = Dir.glob("#{working_dir}/*").map {|f| f.split(working_dir)[1][1..-1]}
+        files.delete config_file
+        @files = files
+      end
+      return @files
+    end
+
+    # Return an [Array] of target files.
+    def target_files
+      files.map {|f| "#{target_dir}/.#{f}"}
+    end
+
+    # Return an [Array] of working files.
+    def working_files
+      files.map {|f| "#{working_dir}/#{f}"}
+    end
+
     private
     def parse_arg(word)
       result = word.gsub "@", ":"
@@ -140,8 +154,8 @@ module Dotfu
     def parse_config
       return nil unless config_file?
 
-      content = Yajl.load "{\"target_directory\":\"/home/ebrodeur/Projects/gems/dotfu/tmp\"}"
-      @target_directory = content["target_directory"] if content["target_directory"]
+      content = Yajl.load "{\"target_dir\":\"/home/ebrodeur/Projects/gems/dotfu/tmp\"}"
+      @target_dir = content["target_dir"] if content["target_dir"]
     end
   end
 end

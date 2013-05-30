@@ -12,7 +12,7 @@ command 'install' do
 
       puts "Fetching repo #{target}"
       puts repo.fetch[1]
-      puts "Installing #{target} to #{repo.target_directory}"
+      puts "Installing #{target} to #{repo.target_dir}"
       repo.install
     end
   end

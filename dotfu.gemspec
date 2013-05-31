@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Ernie Brodeur"]
   spec.email         = ["ebrodeur@ujami.net"]
   spec.description   = "Manage/sync/share dotfiles via github."
-  spec.summary       = "See above."
+  spec.summary       = "More to come . . . "
   spec.homepage      = ""
   spec.license       = "MIT"
 

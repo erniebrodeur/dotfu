@@ -1,6 +1,7 @@
 module Dotfu
   class Repos
     attr_accessor :repo
+    attr_accessor :branch
     attr_accessor :user
     attr_accessor :config_file
     attr_accessor :working_dir
@@ -8,7 +9,7 @@ module Dotfu
 
     # r can be either a repo, or a user:repo pair.
     def initialize(arg = nil)
-      self.repo = parse_arg arg if arg
+      parse_arg arg if arg
       parse_config
     end
 
@@ -43,10 +44,7 @@ module Dotfu
     # initial clone
     def clone
       return nil if !repo || !user
-      cmd = "git clone git://github.com/#{user}/#{repo}.git #{working_dir}"
-
-      out, err, status = Open3.capture3 cmd
-      return [status, out, err]
+      return git_cmd "clone git://github.com/#{user}/#{repo}.git #{working_dir}", false
     end
 
     # A wrapper method to clone or update a repo.
@@ -61,6 +59,10 @@ module Dotfu
 
 
     def install
+      result = git_cmd "checkout #{branch}" if branch
+
+      raise RuntimeError.new result unless result[:status].success?
+
       # lets check if we have anything in the way, and abort instead of partially
       # installing
       existing_files = target_files.select {|f| File.exist? f}
@@ -76,14 +78,7 @@ module Dotfu
 
     def pull
       return nil if !repo || !user
-      cmd = "git pull"
-
-      pwd = Dir.pwd
-      Dir.chdir working_dir
-      out, err, status = Open3.capture3 cmd
-
-      Dir.chdir pwd
-      return [status, out, err]
+      return git_cmd "pull"
     end
 
     def uninstall
@@ -161,22 +156,25 @@ module Dotfu
 
 
     private
+    # So our input is now username@repo:branch
+    # Repo is the only one required.
     def parse_arg(word)
-      result = word.gsub "@", ":"
-      if result.include? ":"
-        output = result.split ":"
-        self.user = output[0]
-        self.repo = output[1]
-      else
-        self.repo = result
+      if word.include? "@"
+        self.name,word = word.split("@")
       end
+
+      if word.include? ":"
+        self.repo, self.branch = word.split(":")
+      end
+
+      self.repo = word if !self.repo
     end
 
     def parse_config
       return nil unless config_file?
 
-      content = Yajl.load "{\"target_dir\":\"/home/ebrodeur/Projects/gems/dotfu/tmp\"}"
-      @target_dir = content["target_dir"] if content["target_dir"]
+      content = Yajl.load open("#{working_dir}/#{config_file}")
+      @target_dir = content["target_directory"] if content["target_directory"]
     end
 
     # Accepts a string or fixnum.  Returns either the string or the files[fixnum]
@@ -184,8 +182,18 @@ module Dotfu
     def file_string(file)
       return file.class == Fixnum ? files[file] : file
     end
+    def git_cmd(cmd, cd = true)
+      if cd
+        pwd = Dir.pwd
+        Dir.chdir working_dir
+      end
+
+      out, err, status = Open3.capture3 "git #{cmd}"
+
+      Dir.chdir pwd if cd
+
+      return {status:status, out:out, err:err}
+    end
+
   end
 end
-
-
-

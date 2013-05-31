@@ -129,3 +129,16 @@ TODO: Write usage instructions here
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+# TODO
+
+* Branches
+* strategies, for example:
+
+how should my tilda repo get installed?  this is a list of non-dotfiles installed into a dotfile.
+
+Deep linking?  Shallow linking?  Dir linking?  Dot only?  Assume only the home dir gets dotted?
+
+The last one is honestly the one I like the best.
+
+Lots of thoughts here.

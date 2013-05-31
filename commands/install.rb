@@ -11,7 +11,7 @@ command 'install' do
       repo = Dotfu::Repos.new target
 
       puts "Fetching repo #{target}"
-      puts repo.fetch[1]
+      puts repo.fetch[:out]
       puts "Installing #{target} to #{repo.target_dir}"
       repo.install
     end

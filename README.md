@@ -1,144 +1,73 @@
-# thought dump:
+# Description
 
-Make a command on the cli called 'dotfiles'.
+Dotfu is a shell command to help all of us manage our dotfiles.  It is designed
+to clone dotfiles from github and install them into your home directory in one command.
 
-This command will interact with github to pull/push/fork/clone repo's named
-dotfiles-*.
+It will also allow you to manage/switch/test other peoples dotfiles on the fly.
 
-It will check your github by default to see what dotfiles you have.
+Right now it will install/uninstall/fetch files.  It will not overwrite your current files, it will abort and let you move them.
 
-Each repo on github will include a file named 'dotfiles.json'.  This file
-contains the configuration directory, post install scripts, or any other info
-needed to install the contents of the repo into a given dir(s).
+Later backup originals, generate repo, search, ...
 
-The main command will have a series of global options that can apply to
-any subcommand.
+# Usage
 
- * --name: the name of the owner of the repo (default pulled from your gitconfig)
- * --host: the host (default github) to search/interact with.
+Dotfu is a subcommand based cli like git.  It supplies various subcommands that do
+the tasks for you. ```--help``` works, but it is rough.
 
-The command will have subcommands,
+## Arguments
+
+Before we go over the commands, it is important to understand the repo format you use.
+I don't know of a github uri, so we will use some shorthand like this ```user@repo:branch```.  Even if we do switch to a uri, I will leave this shorthand.
+
+More about the fields:
+
+ * user: optional, if it's not supplied we try the config file for github.user
+ * repo: required, can be in the form of ```dotfiles-zsh``` or ```zsh```.
+ * branch: optional, if you want to specify the branch to use.  Will switch on install, not fetch.
+
+## Commands
+
+### Currently working:
 
  * list: list all dotfiles-* directores
  * fetch: Pull down a dotfiles-<n> repo into the cache.
  * install: implies fetch, then installs dotfiles-<n> based on the dotfiles.json
- * search: search github for repo's based on <pattern>.
  * uninstall: remove the contents of a repo.
+ * search: search github for repo's based on <pattern>.
+
+### Still to build
+
  * clean: clean unused items from the cache.
  * status: List which df repos that need to get updated.
  * update: update repos.
 
-Install will support --branch to get a specific branch, including specific
-commits.
-
-Install/update/uninstall will support ```any``` as an argument.  This will
-install everything it can by default.  It will also support a gist location
-to support installing sets of dotfiles.
-
-# Strategies:
-
-It will pull the repo into a ~/.cache/dotfiles/n directory.  The file will look
-for config.json, if none is present it will assume all files are to be linked
-to root.  If one is present, it can have specific lists of file/locations and
-list post install scripts as well as files in the directory to ignore.
-
-It will backup along the way.  Likely to ~/.dotfiles/backups, but I may check
-if XDG has some comment on backup directories.
-
-It will cache everything possible.  This is so you can testdrive different
-dotfiles quickly.  Simply install a new one, if you don't like it, install the
-old one and it will relink your files to the previous one.
-
-It will support some sort of meta-group/structured install.  This can be
-achieved with full dependency support, but that's a lot of work.  This could be
-done cheaply with gists (serving as ordered lists of dotfiles to install).  I'm
-unsure if the work/effort is worth the reward on this one.
-
-It will support both files and directories, the repo structure will be flat by
-default but can be overridden based on the dotfiles.json.
-
--> /df-repo/
-  - dotfiles.json
-  - zshrc
-  - zsh/
-    - init.zsh
-    - compdef/ruby
-    - stuff
-
-Their will be no need for sub directories.  Dotfiles and install files will not
-be linked, by default everything else will be.
-
-It will support segments.  These are small sections of files in a larger repo
-that can be managed by command.
-
-All files will be relative to the ```target_directory``` property.
-
-# Configfile
+## Configfile
 
 The config file will be a json blob.  It will be named ```dotfu.json``` and
 should be present at the base of the repo.
 
 ## Fields
 
-  * target_directory
-  * ignore_patterns
-  * segments (see below)
+Currently only target_directory works.
+
+  * target_directory (optional): if not your home dir, where?
+  * ignore_patterns (optional): files in the repo to never install (good for readmes).
+  * segments (optional): see below
 
 # Segments
+
+Segments are labeled selections of files in a repo to install selectively.
 
   * pre_install_script
   * post_install_script
   * routes
 
-# Project Files
-
-  * lib/dotfu/dotfu.rb
-  * lib/dotfu/backup.rb
-  * lib/dotfu/config_parser.rb
-  * lib/dotfu/helpers.rb
-  * lib/dotfu/cache.rb
-
-# Dependencies
-
-# Gh::Dotfiles
-
-TODO: Write a gem description
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'gh-dotfiles'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install gh-dotfiles
-
-## Usage
-
-TODO: Write usage instructions here
+Routes are glob patterns and a target directory for them.
 
 ## Contributing
 
 1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
+2. Create your feature branch (`git checkout -b feature-something`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
+4. Push to the branch (`git push origin feature-something`)
 5. Create new Pull Request
-
-# TODO
-
-* Branches
-* strategies, for example:
-
-how should my tilda repo get installed?  this is a list of non-dotfiles installed into a dotfile.
-
-Deep linking?  Shallow linking?  Dir linking?  Dot only?  Assume only the home dir gets dotted?
-
-The last one is honestly the one I like the best.
-
-Lots of thoughts here.

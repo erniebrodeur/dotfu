@@ -61,7 +61,7 @@ module Dotfu
     def install
       result = git_cmd "checkout #{branch}" if branch
 
-      raise RuntimeError.new result unless result[:status].success?
+      raise RuntimeError.new result unless result && result[:status].success?
 
       # lets check if we have anything in the way, and abort instead of partially
       # installing

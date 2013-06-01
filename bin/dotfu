@@ -2,8 +2,6 @@
 
 require 'dotfu'
 require 'yaml'
-
-
 require 'slop'
 
 if !Dotfu.installed?
@@ -21,8 +19,8 @@ opts = Slop.parse(help:true) do
   on(:data_directory, "Root directory to fetch into (default: #{Bini.data_dir}/repos)")
   on(:target_directory, "Change the default target directory from your home: #{Dir.home}")
 
-  # not sure that this is the right dir after install.  Need to determine that.
-  Dir.glob("commands/*.rb").each do |file|
+
+  Dotfu.commands.each do |file|
     instance_eval open(file).read
   end
 

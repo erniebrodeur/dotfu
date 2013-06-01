@@ -40,6 +40,10 @@ module Dotfu
     return @git_installed
   end
 
+  def commands
+    spec = Gem::Specification.find_by_name("dotfu")
+    return Dir["#{spec.full_gem_path}/commands/*"]
+  end
   Bini.long_name = "dotfu"
   GITHUB ||= Github.new user_agent:"Dotfu: #{Dotfu::VERSION}", auto_pagination:true
 end

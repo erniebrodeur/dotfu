@@ -3,6 +3,7 @@
 require 'dotfu'
 require 'yaml'
 require 'slop'
+require 'git'
 
 if !Dotfu.installed?
   puts "Git does not appear to be installed, aporting."

@@ -44,7 +44,9 @@ module Dotfu
     # initial clone
     def clone
       return nil if !repo || !user
-      return git_cmd "clone git://github.com/#{user}/#{repo}.git #{working_dir}", false
+      uri = "git://github.com/#{user}/#{repo}.git"
+      FileUtils.mkdir_p working_dir
+      return true if Git.clone(uri, repo, path:"#{Bini.data_dir}/repos/#{user}" )
     end
 
     # A wrapper method to clone or update a repo.
@@ -59,9 +61,11 @@ module Dotfu
 
 
     def install
-      result = git_cmd "checkout #{branch}" if branch
+      r = Git.init working_dir
 
-      raise RuntimeError.new result unless result && result[:status].success?
+      result = r.checkout(@batch ? batch : "master")
+
+      raise RuntimeError.new result unless result
 
       # lets check if we have anything in the way, and abort instead of partially
       # installing
@@ -78,7 +82,8 @@ module Dotfu
 
     def pull
       return nil if !repo || !user
-      return git_cmd "pull"
+       r = Git.init working_dir
+       return r.pull
     end
 
     def uninstall
@@ -182,18 +187,5 @@ module Dotfu
     def file_string(file)
       return file.class == Fixnum ? files[file] : file
     end
-    def git_cmd(cmd, cd = true)
-      if cd
-        pwd = Dir.pwd
-        Dir.chdir working_dir
-      end
-
-      out, err, status = Open3.capture3 "git #{cmd}"
-
-      Dir.chdir pwd if cd
-
-      return {status:status, out:out, err:err}
-    end
-
   end
 end

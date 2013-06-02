@@ -63,7 +63,7 @@ module Dotfu
     def install
       r = Git.init working_dir
 
-      result = r.checkout(@batch ? batch : "master")
+      result = r.checkout(@branch ? branch : "master")
 
       raise RuntimeError.new result unless result
 
@@ -82,8 +82,10 @@ module Dotfu
 
     def pull
       return nil if !repo || !user
-       r = Git.init working_dir
-       return r.pull
+      r = Git.init working_dir
+      #TODO: I'm confident that the implicit decleration of first here is going
+      # to muck something up for someone.  Find a way to do this explicitly.
+      return r.remote.merge
     end
 
     def uninstall

@@ -12,8 +12,8 @@ end
 
 opts = Slop.parse(help:true) do
   banner "Dotfu:\n"\
-    "DOTFILES is a string that can be user:repo or user@repo.  If no user is "\
-    "provided, it will attempt to look one up from the git config file.\n"
+    "Simple usage: dotfu install user@repo:branch\n"\
+    "User/branch are optional in all contexts. Check http://github.com/erniebrodeur for more details."
 
   on(:v, :verbose, 'Enable verbose mode')
   on(:version, 'Print the version') {puts "Version #{Dotfu::VERSION}" }

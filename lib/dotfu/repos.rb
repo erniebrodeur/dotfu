@@ -141,8 +141,13 @@ module Dotfu
 
     # Return the target file.
     # Takes a [String] (explicit conversion) or [Array] for index lookup.
-    def target_file(file)
-      "#{target_dir}/.#{file_string(file)}"
+    # dot_home is a [Boolean] that will dot the target dir if it is the home
+    # dir only.
+    def target_file(file, dot_home = true)
+      output = "#{target_dir}/"
+      output += "." if dot_home && target_dir == Dir.home
+      output += file_string(file)
+      return output
     end
 
     # Return an [Array] of target files.
@@ -181,7 +186,7 @@ module Dotfu
       return nil unless config_file?
 
       content = Yajl.load open("#{working_dir}/#{config_file}")
-      @target_dir = content["target_directory"] if content["target_directory"]
+      @target_dir = content["target_directory"].chomp("/") if content["target_directory"]
     end
 
     # Accepts a string or fixnum.  Returns either the string or the files[fixnum]

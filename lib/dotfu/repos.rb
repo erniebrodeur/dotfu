@@ -16,7 +16,7 @@ module Dotfu
 
     ### Specialized attribute methods
     def backup_dir
-      return @backup_dir ? @backup_dir : "#{Bini.data_dir}/backups"
+      return @backup_dir ? @backup_dir : "#{Bini.data_dir}/backups/#{repo}"
     end
 
     def config_file
@@ -50,17 +50,18 @@ module Dotfu
       files = existing_files false
 
       if files.any?
-        d = "#{backup_dir}/#{repo}"
-        FileUtils.mkdir_p d
+        FileUtils.mkdir_p backup_dir
 
         files.each do |target_file|
           working_file = target_file.split("#{target_dir}/").last
           next if is_my_file? target_file
 
           begin
-            FileUtils.mv target_file, "#{d}/#{working_file}"
+            FileUtils.mv target_file, "#{backup_dir}/#{working_file}"
           rescue Exception => e
-            raise RuntimeError.new "File move failed for: #{working_file} to #{d}/#{working_file} failed: #{e}"
+            puts e
+            exit
+            #puts raise RuntimeError.new "File move failed for: #{working_file} to #{backup_dir}/#{working_file} failed: #{e}"
           end
         end
       end
@@ -114,12 +115,23 @@ module Dotfu
       return r.remote.merge
     end
 
+    # Restore files (as neccessary)
+    def restore
+      files = Dir.glob("#{backup_dir}/**/*")
+
+      return true if files.empty?
+      files.each do |f|
+        FileUtils.mv f, target_dir
+      end
+
+      return true
+    end
+
     def uninstall
       raise RuntimeError.new "Not installed." unless installed?
 
-      # ok we are not installed, lets clear the links.  Later, this will restore
-      # the backups (or something similiar).
       target_files.each {|f| FileUtils.rm f}
+      restore
       return true
     end
 
@@ -155,6 +167,7 @@ module Dotfu
       return true if File.exist?(file) && File.symlink?(file) && File.readlink(file).start_with?(working_dir)
       return false
     end
+
     # return an [Array] of base filenames.
     def files
       if !@files

@@ -50,7 +50,12 @@ module Dotfu
       files = existing_files false
 
       if files.any?
+<<<<<<< HEAD
         FileUtils.mkdir_p backup_dir
+=======
+        d = "#{backup_dir}/#{repo}"
+        FileUtils.mkdir_p d
+>>>>>>> 2698d647fd4b0064cdd1f8ded42a404d18b3c321
 
         files.each do |target_file|
           working_file = target_file.split("#{target_dir}/").last

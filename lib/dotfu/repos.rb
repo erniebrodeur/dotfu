@@ -119,7 +119,10 @@ module Dotfu
     def restore
       files = Dir.glob("#{backup_dir}/**/*")
 
+      raise "Files in the way" if existing_files
+
       return true if files.empty?
+
       files.each do |f|
         FileUtils.mv f, target_dir
       end

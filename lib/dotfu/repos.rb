@@ -6,6 +6,7 @@ module Dotfu
     attr_accessor :config_file
     attr_accessor :working_dir
     attr_accessor :target_dir
+    attr_accessor :backup_dir
 
     # r can be either a repo, or a user:repo pair.
     def initialize(arg = nil)
@@ -14,13 +15,12 @@ module Dotfu
     end
 
     ### Specialized attribute methods
-    def config_file
-      return @config_file ? @config_file : "dotfu.json"
+    def backup_dir
+      return @backup_dir ? @backup_dir : "#{Bini.data_dir}/backups"
     end
 
-    # prepend repo with dotfiles- if it doesn't exist as it is set.
-    def repo=(word)
-      return @repo = word.start_with?('dotfiles-') ? word : "dotfiles-#{word}"
+    def config_file
+      return @config_file ? @config_file : "dotfu.json"
     end
 
     # target_dir should always return something.
@@ -28,9 +28,9 @@ module Dotfu
       return @target_dir ? @target_dir : Dir.home
     end
 
-    # return user or the user in the config file.
-    def user
-      return @user ? @user : Dotfu.config_user
+    # prepend repo with dotfiles- if it doesn't exist as it is set.
+    def repo=(word)
+      return @repo = word.start_with?('dotfiles-') ? word : "dotfiles-#{word}"
     end
 
     # return the explicit directory this repo is cloned into.
@@ -39,7 +39,34 @@ module Dotfu
       return "#{Bini.data_dir}/repos/#{user}/#{repo}"
     end
 
+    # return user or the user in the config file.
+    def user
+      return @user ? @user : Dotfu.config_user
+    end
+
     ### Work methods
+    def backup
+      return nil if installed?
+      files = existing_files false
+
+      if files.any?
+        d = "#{backup_dir}/#{repo}"
+        FileUtils.mkdir_p d
+
+        files.each do |target_file|
+          working_file = target_file.split("#{target_dir}/").last
+          next if is_my_file? target_file
+
+          begin
+            FileUtils.mv target_file, "#{d}/#{working_file}"
+          rescue Exception => e
+            raise RuntimeError.new "File move failed for: #{working_file} to #{d}/#{working_file} failed: #{e}"
+          end
+        end
+      end
+
+      return true
+    end
 
     # initial clone
     def clone
@@ -124,7 +151,7 @@ module Dotfu
       return true
     end
 
-    # Return true if this file was installed from our repo.
+    # Return true if this file is linked to this repo.
     def is_my_file?(file)
       return true if File.exist?(file) && File.symlink?(file) && File.readlink(file).start_with?(working_dir)
       return false
@@ -137,6 +164,17 @@ module Dotfu
         @files = files
       end
       return @files
+    end
+
+    # return an array of existing files in the way.
+    # Accepts a [Boolean] as the only argument, true to return files we linked (default),
+    # false if we want just the files that are in the way.
+    def existing_files(my_files = true)
+      # I can do this in a convoluted set of if checks, of a couple readable selects.
+      output = target_files.select { |f| File.exist? f }
+      output.delete_if { |f| my_files && is_my_file?(f)}
+
+      return output
     end
 
     # Return the target file.
@@ -165,7 +203,6 @@ module Dotfu
     def working_files
       files.map {|f| working_file f}
     end
-
 
     private
     # So our input is now username@repo:branch
@@ -196,3 +233,4 @@ module Dotfu
     end
   end
 end
+

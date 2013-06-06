@@ -1,4 +1,4 @@
-# (unreleased)
+# 0.2.0
 * Backups!  sooner then expected.
 * Will now only make dot files in the home dir.
 * updating actually works now, though needs to be refactored.

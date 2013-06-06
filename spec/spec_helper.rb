@@ -1,3 +1,4 @@
+
 if ENV["COVERAGE"] == 'true'
   require 'simplecov'
   require 'simplecov-rcov'
@@ -11,3 +12,6 @@ if ENV["COVERAGE"] == 'true'
   end
 end
 
+require 'dotfu'
+
+TEST_REPO = "https://github.com/erniebrodeur/dotfiles-testfor_dotfu.git"

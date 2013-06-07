@@ -10,9 +10,10 @@ group :development do
   gem "redcarpet"
   gem "guard"
   gem "guard-bundler"
-  gem "guard-rspec"
+  gem "guard-minitest", "~> 1.0.0.beta.2"
   gem "guard-yard"
   gem "guard-shell"
+
   gem 'libnotify',  :require => false
   gem 'growl',      :require => false
   gem 'rb-inotify', :require => false
@@ -21,7 +22,8 @@ group :development do
 end
 
 group :test do
-  gem "rspec"
+  gem "minitest"
+
   gem "webmock"
   gem 'simplecov', :require => false
   gem 'simplecov-rcov', :require => false
